@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ProjectsApp<mysql-java>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.promineotech.mysqljava.projects.ProjectsApp",
+            "projectName": "mysql-java",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
