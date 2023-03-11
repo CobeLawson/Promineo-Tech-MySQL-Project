@@ -13,8 +13,14 @@ import java.math.BigDecimal;
 
 public class ProjectsApp {
     //@formatter:off
-    private List<String> operations = List.of("1) Add a project");
+    private List<String> operations = List.of(
+        "1) Add a project",
+        "2) List projects",
+        "3) Select a project"
+    );
     //@formatter:on
+
+    private Project curProject;
 
     private Scanner scanner = new Scanner(System.in);
     private ProjectService projectService = new ProjectService();
@@ -39,6 +45,12 @@ public class ProjectsApp {
                     case 1:
                         createProject();
                         break;
+                    case 2:
+                        listProjects();
+                        break;
+                    case 3:
+                        selectProject();
+                        break;
                     default:
                         System.out.println("\n" + selection + " is not a valid selection. Try again.");
                 }                
@@ -49,7 +61,7 @@ public class ProjectsApp {
             }
         }
     }
-
+    
     //This method allows the user to input the data they have for the project
     //and then it calls the project service to actually create the new row
     private void createProject() {
@@ -69,6 +81,27 @@ public class ProjectsApp {
 
         Project dbProject = projectService.addProject(project);
         System.out.println("You have successfully created project: " + dbProject);
+    }
+    
+    //This method will list all the stored projects on the terminal for the user to see
+    private void listProjects() {
+        List<Project> projects =projectService.fetchAllProjects();
+
+        System.out.println("\nProjects:");
+
+        projects.forEach(project -> System.out.println("    " + project.getProjectId() + ":  " + project.getProjectName()));
+    }
+    
+    //This method selects a single project the user specifies and lists all relevant info from other tables
+    private void selectProject() {
+        listProjects();
+        Integer projectId = getIntInput("Enter a project ID to select");
+
+        // Unselect the current project.
+        curProject = null;
+
+        //This will throw an exception if an invalid project ID is entered.
+        curProject = projectService.fetchProjectById(projectId);
     }
     
     //This method takes the user's console input and converts it into a BigDecimal data type
@@ -132,6 +165,13 @@ public class ProjectsApp {
         
         // With Lambda expression
         operations.forEach(line -> System.out.println("     " + line));
+    
+        if(Objects.isNull(curProject)) {
+            System.out.println("\nYou are not working with a project.");
+        }
+        else {
+            System.out.println("\nYou are working with project: " + curProject);
+        }
     }
 
 }
