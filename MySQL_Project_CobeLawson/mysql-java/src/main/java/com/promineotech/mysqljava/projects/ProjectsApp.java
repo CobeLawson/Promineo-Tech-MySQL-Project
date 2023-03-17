@@ -16,7 +16,9 @@ public class ProjectsApp {
     private List<String> operations = List.of(
         "1) Add a project",
         "2) List projects",
-        "3) Select a project"
+        "3) Select a project",
+        "4) Update project details",
+        "5) Delete a project"
     );
     //@formatter:on
 
@@ -51,6 +53,12 @@ public class ProjectsApp {
                     case 3:
                         selectProject();
                         break;
+                    case 4:
+                        updateProjectDetails();
+                        break;
+                    case 5:
+                        deleteProject();
+                        break;
                     default:
                         System.out.println("\n" + selection + " is not a valid selection. Try again.");
                 }                
@@ -61,7 +69,7 @@ public class ProjectsApp {
             }
         }
     }
-    
+
     //This method allows the user to input the data they have for the project
     //and then it calls the project service to actually create the new row
     private void createProject() {
@@ -102,6 +110,45 @@ public class ProjectsApp {
 
         //This will throw an exception if an invalid project ID is entered.
         curProject = projectService.fetchProjectById(projectId);
+    }
+    
+    //This method selects a single project the user specifies and calls the ProjectService class to update each field of the project in the database
+    private void updateProjectDetails() {
+        if(Objects.isNull(curProject)) {
+            System.out.println("\nPlease select a project.");
+        }
+
+        String projectName = getStringInput("Enter the project name [" + curProject.getProjectName() + "]");
+        BigDecimal estimatedHours = getDecimalInput("Enter the project estimated hours [" + curProject.getEstimatedHours() + "]");
+        BigDecimal actualHours = getDecimalInput("Enter the project actual hours [" + curProject.getActualHours() + "]");
+        Integer difficulty = getIntInput("Enter the project difficulty [" + curProject.getDifficulty() + "]");
+        String notes = getStringInput("Enter the project notes [" + curProject.getNotes() + "]");
+
+        Project project = new Project();
+
+        project.setProjectId(curProject.getProjectId());
+        project.setProjectName(Objects.isNull(projectName) ? curProject.getProjectName() : projectName);
+        project.setEstimatedHours(Objects.isNull(estimatedHours) ? curProject.getEstimatedHours() : estimatedHours);
+        project.setActualHours(Objects.isNull(actualHours) ? curProject.getActualHours() : actualHours);
+        project.setDifficulty(Objects.isNull(difficulty) ? curProject.getDifficulty() : difficulty);
+        project.setNotes(Objects.isNull(notes) ? curProject.getNotes() : notes);
+
+        projectService.modifyProjectDetails(project);
+        curProject = projectService.fetchProjectById(curProject.getProjectId());
+    }
+
+    //This method takes the user's input to select a project and calls the ProjectService class to delete the project from our database
+    private void deleteProject() {
+        listProjects();
+
+        Integer projectId = getIntInput("Enter the ID of the project you would like to delete");
+
+        projectService.deleteProject(projectId);
+        System.out.println("Project " + projectId + " was deleted successfully.");
+
+        if(Objects.nonNull(curProject) && curProject.getProjectId().equals(projectId)) {
+            curProject = null;
+        }
     }
     
     //This method takes the user's console input and converts it into a BigDecimal data type
